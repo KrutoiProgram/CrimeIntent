@@ -1,11 +1,10 @@
 package com.example.crimeintent
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -14,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val TAG = "CrimeListFragment"
@@ -32,8 +32,33 @@ class CrimeListFragment : Fragment (){
         super.onAttach(context)
         callbacks = context as Callbacks?
     }
-
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu,
+            inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+    override fun onOptionsItemSelected(item:
+                                       MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.new_crime -> {
+                val crime = Crime()
+                crimeListViewModel.addCrime(crime)
+                callbacks?.onCrimeSelected(crime.id)
+                true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
     private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,10 +104,11 @@ class CrimeListFragment : Fragment (){
         init {
             itemView.setOnClickListener(this)
         }
+        @SuppressLint("SimpleDateFormat")
         fun bind(crime: Crime) {
         this.crime = crime
         titleTextView.text = this.crime.title
-        dateTextView.text = this.crime.date.toString()
+        dateTextView.text = SimpleDateFormat("EEEE, MMM d, k:m , yyyy").format(crime.date)
             solvedImageView.visibility = if (crime.isSolved) {
                 View.VISIBLE
             }
