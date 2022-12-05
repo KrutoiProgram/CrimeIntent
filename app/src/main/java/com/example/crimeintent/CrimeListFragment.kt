@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -143,7 +144,10 @@ class CrimeListFragment : Fragment (){
         override fun onBindViewHolder(holder:
                                       CrimeHolder, position: Int) {
             val crime = crimes[position]
-            holder.bind(crime)
+            holder.itemView.animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.recycler_anim)
+            when(holder){
+                is CrimeHolder -> holder.bind(crime)
+            }
         }
     }
 
